@@ -1,0 +1,530 @@
+{% extends 'shops/lay/mainnn.html' %}
+{% block title %}
+  Registration | ShopKart
+{% endblock title %}
+
+
+
+{% block content %}
+<section class="bg-light py-4 my-5" style="min-height:600px;">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <h4 class="mb-3">  {{products.name}} Details</h4>
+        <hr style="border-color:#b8bfc2;">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'collections' products.category.name  %}">Collections</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{products.name}}</li>
+          </ol>
+        </nav>
+        {% include 'shops/abc/message.html' %}
+      </div>
+      <div class="col-5 my-3 pic-box">
+        {% if products.trending %}
+          <div class="hot">New</div>
+          {% endif %}
+          
+          <img src="{{products.product_image.url}}"  class="card-image-top" alt="{{products.name}}" id="product_image">
+      </div>
+      <div class="col-5 my-3" >
+          <h5 class="text-success">{{products.name | upper}}</h5>
+          <p>{{products.description}}</p>
+          <p id="price" >Unit per RS :</p>
+          <p id="Totalprice" > Total RS :</p>
+          <p id="product_id" style="display: none;">{{ products.id }}</p>
+          
+          <form method="get">
+            <label for="color"><b>Select Color</b></label>
+            
+            <select id="color" class="form-control" style="width:50%" name="color">
+                <option value="0">-- Choose Color --</option>
+                {% for color in color_names_list %}
+               
+                    <option value="{{ color.id }}" {% if color.name == selected_color %}selected{% endif %}>{{ color.name }}</option>
+                {% endfor %}
+            </select><br>
+        
+            <label for="size"><b>Select Size</b></label>
+            <select id="size" class="form-control" style="width:50%" name="size">
+                <option value="0">-- Choose Size --</option>
+                {% for size in size_names_list %}
+                    <option value="{{ size.id }}" {% if size.name == selected_size %}selected{% endif %}>{{ size.name }}</option>
+                {% endfor %}
+            </select><br>
+
+            <label for="thickness"><b>Select Thickness</b></label>
+            
+            <select id="thickness" class="form-control" style="width:50%" name="thickness">
+                <option value="0">-- Choose Thickness --</option>
+                {% for thickness in thickness_names_list %}
+                    <option value="{{ thickness.id }}" {% if thickness.name == selected_thickness %}selected{% endif %}>{{ thickness.name }}</option>
+                {% endfor %}
+            </select>
+          <div class="my-3" id="qty_div1">         
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script type="text/javascript"> window.CSRF_TOKEN = "{{ csrf_token }}"; </script>
+
+<script>
+
+var productId = $('#product_id').html();
+
+$(document).ready(function(){
+  
+  var formContent  = '<p>';
+      formContent += '<input type="hidden" value="products.id" id="piddd">';
+      formContent += '<p>';
+      formContent += '<div class="input-group" style="width:150px">';
+      formContent += '<button class="input-group-text bg-success text-light" id="btnMinus" type="button" >';
+      formContent += '<i class="fa fa-minus"></i>';
+      formContent += '</button>';
+      formContent += '<input type="text" name="qty" id="txtQty" value="1" class="form-control text-center">';
+      formContent += '<button class="input-group-text bg-success text-light" id="btnPlus" type="button"><i class="fa fa-plus"></i></button>';
+      formContent += '</div>';
+      formContent += '</p>';
+      formContent += '<button class="btn btn-primary" id="btnCart"><i class="fa fa-shopping-cart"></i> Add to Cart</button>';
+      formContent += '<button class="btn btn-secondary" id="outofstock"><i class="fa fa-minus"></i> Out of Stock</button>';
+      formContent += '<button class="btn btn-danger" id="btnFav"><i class="fa fa-heart"></i></button>';
+      formContent += '</div>';
+    
+      
+    $("#qty_div1").html(formContent);
+    $('#outofstock').hide();
+    
+    
+    $(document).ready(function(){
+
+      $('#color').on('change', function(event) {
+        event.preventDefault();
+      
+           var colorId     = $('#color').val();
+           var sizeId      = $('#size').val();
+           var thicknessId = $('#thickness').val();
+  
+            console.log(sizeId);
+            console.log(thicknessId);
+  
+          if (colorId !== '0' && sizeId !== '0' && colorId !== '0'){
+            $('#outofstock').hide();
+          
+  
+            $.ajax({
+              //give url as your network ip_address
+              url     : 'http://192.168.29.35:8000/basic/',
+              data    : {csrfmiddlewaretoken: window.CSRF_TOKEN,product_id:productId,color_id:colorId,size_id:sizeId,thickness_id:thicknessId},
+              method  : 'POST',
+              dataType: 'json',
+              success : function (data) {
+              
+                  var firstObject = data[0];
+                  console.log(firstObject.price);
+                  console.log(firstObject.product_image);
+                  
+                  $('#price').html(firstObject.price);
+                  $('#quantity').html(firstObject.quantity);
+                  $('#product_image').attr('src', firstObject.product_image);
+                
+                  if(firstObject.quantity>0){
+  
+                    console.log("stock available")
+                   
+                      $('#btnPlus').click(function() {
+                        var quantityInput = $('#txtQty');
+                        var currentQuantity = parseInt(quantityInput.val(), 10);
+                        quantityInput.val(currentQuantity + 1);
+                        updateTotalPrice();
+                      });
+  
+                      $('#btnMinus').click(function() {
+                        var quantityInput = $('#txtQty');
+                        var currentQuantity = parseInt(quantityInput.val(), 10);
+                        if (currentQuantity > 1) {
+                          quantityInput.val(currentQuantity - 1);
+                        }
+                        updateTotalPrice();
+                      });
+                      
+                      $('#txtQty').change(function() {
+                        updateTotalPrice();
+                      });
+  
+                      updateTotalPrice();
+                      $('#piddd').submit(function(event) {
+                        event.preventDefault();
+                        var formData = $(this).serializeArray();
+                        console.log(formData);
+                      });
+                  } 
+                  else{
+                    console.log("Out of stock");
+                    $('#outofstock').show();
+                    $('#btnCart').hide();
+                    $('#btnFav').hide();
+                    return;
+                  } 
+                  
+                  function updateTotalPrice() {
+                    var quantity = parseInt($('#txtQty').val(), 10);
+                    var pricePerUnit = parseFloat($('#price').html());
+                    var totalPrice = quantity * pricePerUnit;
+                    $('#Totalprice').html('Rs' + totalPrice.toFixed(2));
+                  }
+            
+              },
+              error: function (error) {
+                  console.error('Error fetching products:', error);
+              }
+  
+            
+          });
+        }
+        else {
+          console.log('Please select values');
+        }
+      });
+    }); 
+
+  
+    
+      $('#size').on('change', function(event) {
+        event.preventDefault();
+
+         var colorId = $('#color').val();
+         var sizeId = $('#size').val();
+         var thicknessId = $('#thickness').val();
+          console.log(colorId);
+          console.log(thicknessId);
+          
+            if (colorId !== '0' && sizeId !== '0' && colorId !== '0') {
+              $('#outofstock').hide();
+            
+            $.ajax({
+              //give url as your network ip_address
+              url: 'http://192.168.29.35:8000/basic/',
+              data: {csrfmiddlewaretoken: window.CSRF_TOKEN,product_id:productId,color_id:colorId,size_id:sizeId,thickness_id:thicknessId},
+              method: 'POST',
+              dataType: 'json',
+              success: function (data) {
+                  var firstObject = data[0];
+                  console.log(firstObject.price);
+                  console.log(firstObject.product_image);
+                  
+                  $('#price').html(firstObject.price);
+                  $('#quantity').html(firstObject.quantity);
+                  $('#product_image').attr('src', firstObject.product_image);
+
+                  if(firstObject.quantity>0){
+                  console.log("stock available")
+                  
+                    $('#btnPlus').click(function() {
+                      var quantityInput = $('#txtQty');
+                      var currentQuantity = parseInt(quantityInput.val(), 10);
+                      quantityInput.val(currentQuantity + 1);
+                      updateTotalPrice();
+                    });
+
+                    $('#btnMinus').click(function() {
+                      var quantityInput = $('#txtQty');
+                    
+                      var currentQuantity = parseInt(quantityInput.val(), 10);
+                      if (currentQuantity > 1) {
+                        quantityInput.val(currentQuantity - 1);
+                      }
+                      updateTotalPrice();
+                    });
+
+                    $('#txtQty').change(function() {
+                      updateTotalPrice();
+                    });
+
+                    updateTotalPrice();
+
+                    $('#piddd').submit(function(event) {
+                      event.preventDefault();
+                      var formData = $(this).serializeArray();
+                      console.log(formData);
+                    });
+
+
+                }else{
+                  console.log("Out of stock");
+                  $('#outofstock').show();
+                  $('#btnCart').hide();
+                  $('#btnFav').hide();
+                  return;
+                }
+                
+                function updateTotalPrice() {
+                  var quantity = parseInt($('#txtQty').val(), 10); 
+                  var pricePerUnit = parseFloat($('#price').html());
+                  var totalPrice = quantity * pricePerUnit;
+                  $('#Totalprice').html('Rs' + totalPrice.toFixed(2));
+                }
+              },
+              error: function (error) {
+                  console.error('Error fetching products:', error);
+              }
+          });
+
+        } else {
+          console.log('Please select values');
+          
+      }  
+
+        });    
+    });
+
+    $('#thickness').on('change', function(event) {
+        event.preventDefault();
+         var colorId = $('#color').val();
+         var sizeId = $('#size').val();
+         var thicknessId = $('#thickness').val();
+
+          console.log(sizeId);
+          console.log(colorId);
+          console.log(thicknessId);
+           
+          if (colorId !== '0' && sizeId !== '0' && colorId !== '0') {
+            $('#outofstock').hide();
+          
+          $.ajax({
+              //give url as your network ip_address
+            url: 'http://192.168.29.35:8000/basic/',
+            data: {csrfmiddlewaretoken: window.CSRF_TOKEN,product_id:productId,color_id:colorId,size_id:sizeId,thickness_id:thicknessId},
+            method: 'POST',
+            dataType: 'json',
+            success: function (data) {
+                var firstObject = data[0];
+                $('#price').html(firstObject.price);
+                $('#quantity').html(firstObject.quantity);
+                $('#product_image').attr('src', firstObject.product_image);
+               if(firstObject.quantity>0){
+
+                  console.log("stock available")
+                  $('#btnPlus').click(function() {
+                    var quantityInput = $('#txtQty');
+                   
+                    var currentQuantity = parseInt(quantityInput.val(), 10);
+                    quantityInput.val(currentQuantity + 1);
+                    
+
+                    updateTotalPrice();
+                  });
+
+                  $('#btnMinus').click(function() {
+                    var quantityInput = $('#txtQty');
+                   
+                    var currentQuantity = parseInt(quantityInput.val(), 10);
+                    if (currentQuantity > 1) {
+                      quantityInput.val(currentQuantity - 1);
+                    }
+                    updateTotalPrice();
+                  });
+
+                  $('#txtQty').change(function() {
+                    updateTotalPrice();
+                  });
+
+                  updateTotalPrice();
+
+                  $('#piddd').submit(function(event) {
+                    event.preventDefault();
+          
+                    var formData = $(this).serializeArray();
+                    console.log(formData);
+                  });
+              }else{
+                console.log("Out of stock");
+                $('#outofstock').show();
+                $('#btnCart').hide();
+                $('#btnFav').hide();
+                return;
+              }
+              
+              function updateTotalPrice() {
+                var quantity = parseInt($('#txtQty').val(), 10);           
+                var pricePerUnit = parseFloat($('#price').html());                      
+                var totalPrice = quantity * pricePerUnit;
+                $('#Totalprice').html('Rs' + totalPrice.toFixed(2));
+              }
+               
+            },
+            error: function (error) {
+                console.error('Error fetching products:', error);
+            }
+        });
+      } else {
+        console.log('Please select values');
+    }
+    });  
+    
+  
+        
+    $(document).ready(function () {
+      $("#btnCart").click(function (event) {
+        event.preventDefault();
+          
+          var image = $("#product_image").attr("id");
+          var colorId = $("#color").val();
+          var sizeId = $("#size").val();
+          var thicknessId = $("#thickness").val();
+          var priceId = $("#price").html();
+          var quantity = $("#txtQty").val();
+         
+        if (quantity>0){
+          $.ajax({
+              //give url as your network ip_address
+              url:'http://192.168.29.35:8000/add_to_cart/',
+              data: {csrfmiddlewaretoken: window.CSRF_TOKEN,product_id:productId,product_qty:quantity,color_id:colorId,size_id:sizeId,thickness_id:thicknessId,price_id:priceId,image_id:image},
+              method: 'POST',
+              dataType: 'json',
+              
+              success: function (data) { 
+              console.log(data);
+              if (data.status === 'Product Added to Cart') {
+                alert('Item added to cart!');
+              } 
+              else if (data.status === 'Product Already in Cart') {
+                alert('Item already in cart!');
+              } 
+              else {
+                  alert('Unknown response status');
+              }
+              },
+              error: function (xhr, status, error) {
+                alert('Error: ' + xhr.responseText);
+            }
+          });
+      }else{
+        alert("Please Enter The Quantity");
+      }
+    });
+    
+    
+      $("#btnFav").click(function (event) {
+        event.preventDefault();
+          
+          var image = "{{ products.product_image.url }}";
+          var colorId = $("#color").val();
+          var sizeId = $("#size").val();
+          var thicknessId = $("#thickness").val();
+          var priceId = $("#price").html();
+          var quantity = $("#txtQty").val();
+          
+          $.ajax({
+              //give url as your network ip_address
+              url:'http://192.168.29.35:8000/add_to_fav/',
+              data: {csrfmiddlewaretoken: window.CSRF_TOKEN,product_id:productId,product_qty:quantity,color_id:colorId,size_id:sizeId,thickness_id:thicknessId,price_id:priceId,image_id:image},
+              method: 'POST',
+              dataType: 'json',
+              success: function (data) { 
+              console.log(data);
+              if (data.status === 'Product Added to Wish List') {
+                alert('Item added to Wish List!');
+              } 
+              else if (data.status === 'Product Already in Wish List') {
+                alert('Item already in Wish List!');
+              } 
+              else {
+                  alert('Unknown response status');
+              }
+              },
+              error: function(xhr, status, error) {
+                  alert(xhr.responseText);
+                  
+              }
+        });
+    });
+});
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", function(event) {
+  const btnPlus = document.getElementById("btnPlus");
+  const btnMinus = document.getElementById("btnMinus");
+  const txtQty = document.getElementById("txtQty");
+  const pid = document.getElementById("piddd");
+  //const btnCart = document.getElementById("btnCart");
+  const btnFav = document.getElementById("btnFav");
+
+  console.log(btnPlus);
+  console.log(btnMinus);
+  console.log(txtQty);
+  console.log(pid);
+  //console.log(btnCart);
+  console.log(btnFav);
+  
+  //alert(btnPlus);
+ 
+  const btn1Plus = document.getElementById("btn1Plus");
+
+  btnPlus.addEventListener("click", function() {
+    let qty=parseInt(txtQty.value,10);
+    qty=isNaN(qty)?0:qty;
+    console.log(qty);
+    if(qty<10){
+      qty++;
+      txtQty.value=qty;
+    }
+  });
+
+  btnMinus.addEventListener("click", function() {
+      let qty=parseInt(txtQty.value,10);
+      qty=isNaN(qty)?0:qty;
+      //console.log(qty);
+      if(qty>1){
+        qty--;
+        txtQty.value=qty;
+      }
+  });
+
+  
+ 
+  btnFav.addEventListener("click", function() {
+     
+        let postObj = { 
+            'pid': pid.value
+        }
+        console.log(postObj);
+        fetch("/fav",{
+          method: 'POST',
+          credentials: 'same-origin',
+          headers:{
+              'Accept': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRFToken': '{{ csrf_token }}',
+          },
+          body: JSON.stringify(postObj)
+        }).then(response => {
+	        return response.json();
+        }).then(data => {
+        	//console.log(data);
+          alert(data['status']);
+        });
+      
+  });
+
+
+});
+</script>
+
+
+{% endblock content %}

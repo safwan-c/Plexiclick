@@ -1,0 +1,77 @@
+{% extends 'shops/lay/mainnn.html' %}
+{% block title %}
+  Cart | ShopKart
+{% endblock title %}
+{% block content %}
+
+<div class="py-3 bg-primary">
+    <div class="container">
+        <a class="text-white" href="">Home</a>
+        <a class="text-white" href="">My Orders</a>
+    </div>
+</div>
+<div class="container my-3">
+    <div class="row">
+      <div class="col-md-12">
+         <div class="card show">
+            <div class="card-header">
+            <h3 class="mb-0">Order View
+            <a href="{%url 'my_orders' %}" class="btn btn-warning float-end text-white"><i class="fa fa-reply"></i>Back</a>
+            </h3>
+            </div>
+            {%for item in orders %}
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Shipping Details</h4>
+                        <hr>
+                        <label class="mt-2">First Name</label>
+                        <div class="border p-1"> {{item.first_name}} </div>
+                        <label class="mt-2">Last Name</label>
+                        <div class="border p-1"> {{item.last_name}} </div>
+                        <label class="mt-2">Address</label>
+                        <div class="border p-1"> {{item.address}}, {{item.zipcode}}, {{item.city}}, {{item.state}}, {{item.country}}  </div>
+                        <label class="mt-2">Phone</label>
+                        <div class="border p-1"> {{item.phone}} </div>
+                        <label class="mt-2">Notes</label>
+                        <div class="border p-1"> {{item.notes}} </div>
+                        </hr>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Name & Details</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Image</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {%for item in orderitems %}
+                                <tr>
+                                    <td><b>{{item.product.name}}</b><br>
+                                        Color:{{item.variant.color}} , Size:{{item.variant.size}} , Thickness:{{item.variant.thickness}}</td>
+                                    <td>{{ item.product_qty }}</td>
+                                    <td>{{ item.variant.price | stringformat:'d'}}</td>
+                                    <td><img src="{{item.variant.product_image.url}}" height="50px" width"50px" alt="{{item.variant.name}}"></td> 
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        
+                        <h4>Grand Total:<span class="float-end"> {{ item.total_price | stringformat:'d'}}</span></h4>
+                        <h6 class="border p-2">Payment Mode: {{ item.status}}</h6>
+                        <h6 class="border p-2">Order status: {{ item.status}}</h6>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+</div> <!-- End of container -->
+
+{% endblock %}

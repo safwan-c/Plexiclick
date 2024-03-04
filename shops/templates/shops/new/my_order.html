@@ -1,0 +1,62 @@
+{% extends 'shops/lay/mainnn.html' %}
+{% block title %}
+  Cart | ShopKart
+{% endblock title %}
+{% block content %}
+
+<div class="py-3 bg-primary">
+  <div class="container">
+    <a class="text-white" href="">Home</a>
+    <a class="text-white" href="">My Orders</a>
+  </div>
+</div>
+<div class="container my-3">
+  <div class="row">
+    <div class="col-md-12">
+       <div class="card show">
+          <div class="card-header">
+          <h3 class="mb-0">My Orders</h3>
+          </div>
+        <div class="card-body">
+          <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Order ID</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in orders %}
+                <tr>
+                    <td>{{ item.created_date }}</td>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.first_name}} {{ item.last_name}}</td>
+                    <td>{{ item.status }}</td>
+                    <td>
+                         <a href="{%url 'orderview' item.id %}" class="btn btn-primary">View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+          
+            
+            
+            
+            
+            
+            
+  
+
+
+
+
+{% endblock content %}

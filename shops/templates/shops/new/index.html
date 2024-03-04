@@ -1,0 +1,179 @@
+{% extends 'shops/lay/mainnn.html' %}
+{% block title %}
+  Plexi Click-The Acrylic Expert
+{% endblock title %}
+{% block content %}
+
+<section class="hero">
+    <div class="hero__items set-bg" data-setbg="static/img/hero/Copy-of-Unnamed-Design-1.png">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-5 col-lg-7 col-md-8">
+                    <h6><b>The Acrylic Expert</b></h6>
+                    <h2 style="font-family: 'Times New Roman', sans-serif; font-size: 50px ">Explore the latest products and shop the best!</h2>
+
+                    <br><br><br>
+                    <a href="{% url 'shop' %}" class="button button-blue">Shop now <span class="arrow_right"></span></a><br>
+                    <a href="{% url 'about' %}" class="button">Learn More <span class="arrow_right"></span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <br><br>
+
+    <div class="icontainer">
+        <div class='icon-container'>
+            <div class="icon-wrapper">
+                <img src="static/img/van (Custom).png" class="icon">
+                <span>Fast Delivery</span>
+            </div>
+            <div class="icon-wrapper">
+                <img src="static/img/customer-service (Custom).png" class="icon">
+                <span>Dedicated Support</span>
+            </div>
+            <div class="icon-wrapper">
+                <img src="static/img/money (Custom).png" class="icon">
+                <span>Money Back Guarantee</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+            </div>
+        </div>
+        <div class="row mt-5"> <!-- Add margin-top to create space -->
+            {% for item in category %}
+            <div class="col-md-3 col-lg-3.5">
+                <div class="card my-3">
+                    <a href="{% url 'collections' item.name %}" style="color: black;">
+                        <img src="{{ item.image.url }}" class="card-img-top" alt="Categories">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">{{ item.name }}</h5>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Product Section Begin -->
+    <section class="product spad">
+        <div class="container">
+            <div class="row">
+                <div class="container" style="margin-top:100px;">
+                    <div class="row" align="center">
+                        <div class="col-12">
+                            <h6 class="mb-3" style="color: #111111; font-family: 'Arial', sans-serif;"><b>TOP SALE OF THE WEEK</b></h6>
+                            <h2 class="mb-3" style="color: #ff1493; font-family: 'Times New Roman', sans-serif; font-size: 50px;"><b>Featured Products</b></h2>
+                            <p style="color: #808080; font-family: 'Arial', sans-serif;">Some of our featured products are live now. Check them out and get the latest offers at the earliest.</p>
+                            
+                        </div>
+                    </div>
+                </div>
+                
+                
+                {% for item in products %}
+                <div class="col-md-4 col-lg-3 mb-4">
+                    <div class="card">
+                        <a href="{% url 'shop' %}">
+                            <img src="{{ item.product_image.url }}" class="card-img-top rounded-top" alt="{{ item.name }}">
+                        </a>
+                        <div class="card-body">
+                            <h5 class="card-title text-primary" style="color: black;">{{ item.name }}</h5>
+                            <p class="card-text">{{ item.description }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                
+                <center>
+                <div class="col-xl-5 col-lg-7 col-md-8">
+                    <a href="{%url 'shop' %}" button class="button">Shop now   <span class="arrow_right"></span></a>
+                </center>
+    </div>
+</section> 
+    
+    <!-- Search Begin -->
+    <div class="search-model">
+        <div class="h-100 d-flex align-items-center justify-content-center">
+            <div class="search-close-switch">+</div>
+            <form class="search-model-form">
+                <input type="text" id="search-input" placeholder="Search here.....">
+            </form>
+        </div>
+    </div>
+    <!-- Search End -->
+
+    <!-- Js Plugins -->
+    <script src="static/js/jquery-3.3.1.min.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
+    <script src="static/js/jquery.nice-select.min.js"></script>
+    <script src="static/js/jquery.nicescroll.min.js"></script>
+    <script src="static/js/jquery.magnific-popup.min.js"></script>
+    <script src="static/js/jquery.countdown.min.js"></script>
+    <script src="static/js/jquery.slicknav.js"></script>
+    <script src="static/js/mixitup.min.js"></script>
+    <script src="static/js/owl.carousel.min.js"></script>
+    <script src="static/js/main.js"></script>
+    
+    <style>
+    .icontainer {
+        display: flex;
+        justify-content: center; /* Center the container horizontally */
+    }
+    
+    .icon-container {
+        display: flex;
+    }
+    
+    .icon-wrapper {
+        display: inline-flex;
+        align-items: center;
+        margin-right: 60px; /* Adjust the margin as needed */
+        padding-right: 60px;
+        border-right: 2px solid #ccc;
+    }
+    
+    .icon-wrapper:last-child {
+        margin-right: 0; /* Remove margin from the last icon-wrapper */
+        border-right: none;
+    }
+    
+    .icon-wrapper img {
+        width: 50px;
+        height: auto;
+    }
+    
+    .icon-wrapper span {
+        font-size: 25px;
+    }
+    
+    /*--------------*/
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+    
+    
+    
+    .button-blue {
+        background-color: #007bff; /* Dark blue color */
+        color: #fff; /* White text color */
+    }
+    
+    .button-blue:hover {
+        background-color: #0056b3; /* Darker shade of blue on hover */
+    }</style>
+
+
+{% endblock content %}
